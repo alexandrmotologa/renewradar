@@ -23,5 +23,8 @@
     "privacy-first"
   ],
   "author": "Alexandr Motologa",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "puppeteer-core": "^25.10.0"
+  }
 }

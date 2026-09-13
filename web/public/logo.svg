@@ -4,19 +4,22 @@
       <rect x="24" y="24" width="976" height="976" rx="220" />
     </clipPath>
 
-    <linearGradient id="cyan-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Electric Cyan Telemetry Gradient -->
+    <linearGradient id="cyan-optic" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00f5ff" />
       <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
 
-    <linearGradient id="amber-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Warm Amber Sentinel Core Gradient -->
+    <linearGradient id="amber-core" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#fbbf24" />
-      <stop offset="100%" stop-color="#f97316" />
+      <stop offset="100%" stop-color="#ea580c" />
     </linearGradient>
 
-    <linearGradient id="slate-body" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#0a0f1d" />
+    <!-- Titanium Slate Facet Gradients (Volumetric 45-degree Lighting) -->
+    <linearGradient id="facet-bright" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64748b" />
+      <stop offset="100%" stop-color="#475569" />
     </linearGradient>
 
     <linearGradient id="facet-light" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -24,27 +27,37 @@
       <stop offset="100%" stop-color="#334155" />
     </linearGradient>
 
+    <linearGradient id="facet-mid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+
     <linearGradient id="facet-dark" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#1e293b" />
       <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <linearGradient id="facet-deep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#060911" />
     </linearGradient>
 
     <filter id="subtle-shadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.14" />
     </filter>
 
-    <filter id="radar-glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#00f5ff" flood-opacity="0.6" />
+    <filter id="optic-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#00f5ff" flood-opacity="0.8" />
     </filter>
   </defs>
 
-  <!-- Luxury White Squircle Container -->
+  <!-- Luxury White Squircle Container (Developer-Branding Formula) -->
   <rect x="24" y="24" width="976" height="976" rx="220" fill="#ffffff" stroke="#e2e8f0" stroke-width="6" />
 
   <g clip-path="url(#squircle-clip)">
     <g transform="translate(512, 512)" filter="url(#subtle-shadow)">
 
-      <!-- Hexagonal Architectural Gateway -->
+      <!-- Hexagonal Architectural Gateway Frame -->
       <polygon points="
         0,-390
         338,-195
@@ -54,7 +67,7 @@
         -338,-195
       " fill="none" stroke="#0f172a" stroke-width="36" stroke-linejoin="round" />
 
-      <!-- Concentric Radar Sweep Ring -->
+      <!-- Concentric Dashed Cyan Radar Ring -->
       <polygon points="
         0,-355
         307,-177
@@ -64,124 +77,110 @@
         -307,-177
       " fill="none" stroke="#00f5ff" stroke-width="4" opacity="0.45" stroke-dasharray="16, 12" />
 
-      <!-- Outer Radar Wave Arcs -->
-      <circle cx="0" cy="0" r="320" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.12" />
-      <circle cx="0" cy="0" r="240" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.18" />
-      <circle cx="0" cy="0" r="160" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.25" />
+      <!-- Parabolic Radar Wave Background Arcs -->
+      <circle cx="0" cy="-20" r="315" fill="none" stroke="#00f5ff" stroke-width="1.5" opacity="0.1" />
+      <circle cx="0" cy="-20" r="230" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.16" />
+      <circle cx="0" cy="-20" r="145" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.24" />
 
-      <!-- Watertight Base Silhouette of the Radar Owl -->
+      <!-- 100% Watertight Solid Base Silhouette (Zero-Leak Rule) -->
       <path d="
-        M 0,-190
-        L 80,-220 L 150,-290 L 160,-170 L 220,-120 L 250,-20 L 235,80 L 180,210 L 110,310 L 0,350
-        L -110,310 L -180,210 L -235,80 L -250,-20 L -220,-120 L -160,-170 L -150,-290 L -80,-220
+        M 0,-185
+        L 90,-240 L 175,-335 L 180,-190 L 255,-120 L 285,-15 L 260,105 L 190,235 L 110,340 L 0,380
+        L -110,340 L -190,235 L -260,105 L -285,-15 L -255,-120 L -180,-190 L -175,-335 L -90,-240
         Z
-      " fill="#090d16" stroke="#0f172a" stroke-width="4" stroke-linejoin="round" />
+      " fill="#060911" stroke="#0f172a" stroke-width="4" stroke-linejoin="round" />
 
-      <!-- ================= LEFT EAR TUFT & CROWN ================= -->
-      <polygon points="0,-190 -80,-220 -150,-290 -115,-205" fill="#334155" />
-      <polygon points="-80,-220 -150,-290 -160,-170 -115,-205" fill="#1e293b" />
-      <line x1="-80" y1="-220" x2="-150" y2="-290" stroke="#00f5ff" stroke-width="3" opacity="0.8" />
+      <!-- ================= SENTINEL EAR TUFTS / HORNS ================= -->
+      <!-- Left Ear Horn -->
+      <polygon points="0,-185 -90,-240 -175,-335 -120,-205" fill="url(#facet-mid)" />
+      <polygon points="-90,-240 -175,-335 -180,-190 -120,-205" fill="url(#facet-dark)" />
+      <polygon points="-175,-335 -180,-190 -140,-170" fill="url(#facet-deep)" />
 
-      <!-- ================= RIGHT EAR TUFT & CROWN ================= -->
-      <polygon points="0,-190 80,-220 150,-290 115,-205" fill="#475569" />
-      <polygon points="80,-220 150,-290 160,-170 115,-205" fill="#1e293b" />
-      <line x1="80" y1="-220" x2="150" y2="-290" stroke="#00f5ff" stroke-width="3" opacity="0.8" />
+      <!-- Right Ear Horn (Key light side from top-right) -->
+      <polygon points="0,-185 90,-240 175,-335 120,-205" fill="url(#facet-bright)" />
+      <polygon points="90,-240 175,-335 180,-190 120,-205" fill="url(#facet-light)" />
+      <polygon points="175,-335 180,-190 140,-170" fill="url(#facet-mid)" />
 
-      <!-- Crown Center Brow -->
-      <polygon points="0,-190 -115,-205 0,-130" fill="#1e293b" />
-      <polygon points="0,-190 115,-205 0,-130" fill="#334155" />
+      <!-- Forehead Crown Center Facets -->
+      <polygon points="0,-185 -120,-205 0,-125" fill="url(#facet-dark)" />
+      <polygon points="0,-185 120,-205 0,-125" fill="url(#facet-light)" />
 
-      <!-- ================= CHEEK FACETS ================= -->
-      <!-- Left Outer Cheeks -->
-      <polygon points="-160,-170 -220,-120 -160,-70" fill="#1e293b" />
-      <polygon points="-220,-120 -250,-20 -160,-20" fill="#0f172a" />
-      <polygon points="-250,-20 -235,80 -150,70" fill="#1e293b" />
+      <!-- ================= ACOUSTIC RADAR FACIAL DISCS ================= -->
+      <!-- Left Facial Disc (Outer rim) -->
+      <polygon points="-180,-190 -255,-120 -180,-60" fill="url(#facet-dark)" />
+      <polygon points="-255,-120 -285,-15 -180,-15" fill="url(#facet-deep)" />
+      <polygon points="-285,-15 -260,105 -165,80" fill="url(#facet-dark)" />
 
-      <!-- Right Outer Cheeks -->
-      <polygon points="160,-170 220,-120 160,-70" fill="#334155" />
-      <polygon points="220,-120 250,-20 160,-20" fill="#1e293b" />
-      <polygon points="250,-20 235,80 150,70" fill="#334155" />
+      <!-- Right Facial Disc (Outer rim) -->
+      <polygon points="180,-190 255,-120 180,-60" fill="url(#facet-light)" />
+      <polygon points="255,-120 285,-15 180,-15" fill="url(#facet-bright)" />
+      <polygon points="285,-15 260,105 165,80" fill="url(#facet-light)" />
 
-      <!-- ================= ACOUSTIC RADAR DISCS (FACIAL PLATES) ================= -->
-      <!-- Left Facial Plate -->
-      <polygon points="0,-130 -115,-205 -160,-70 -90,-40" fill="#1e293b" />
-      <polygon points="-160,-70 -160,-20 -90,-20" fill="#334155" />
-      <polygon points="-160,-20 -150,70 -70,60" fill="#1e293b" />
-      <polygon points="-90,-40 -160,-70 -90,-20" fill="#0f172a" />
+      <!-- Left Inner Radar Disc Concavity -->
+      <polygon points="0,-125 -120,-205 -180,-60 -95,-40" fill="url(#facet-dark)" />
+      <polygon points="-180,-60 -180,-15 -95,-15" fill="url(#facet-mid)" />
+      <polygon points="-180,-15 -165,80 -75,70" fill="url(#facet-dark)" />
+      <polygon points="-95,-40 -180,-60 -95,-15" fill="url(#facet-deep)" />
 
-      <!-- Right Facial Plate -->
-      <polygon points="0,-130 115,-205 160,-70 90,-40" fill="#334155" />
-      <polygon points="160,-70 160,-20 90,-20" fill="#475569" />
-      <polygon points="160,-20 150,70 70,60" fill="#1e293b" />
-      <polygon points="90,-40 160,-70 90,-20" fill="#1e293b" />
-
-      <!-- Facial Radar Ring Concentric Arcs -->
-      <!-- Left Radar Dish Arcs -->
-      <path d="M -145,-75 A 55 55 0 0 1 -75,-25" fill="none" stroke="#00f5ff" stroke-width="2.5" opacity="0.7" stroke-dasharray="6,4" />
-      <path d="M -135,-85 A 70 70 0 0 1 -55,-25" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.4" />
-      
-      <!-- Right Radar Dish Arcs -->
-      <path d="M 145,-75 A 55 55 0 0 0 75,-25" fill="none" stroke="#00f5ff" stroke-width="2.5" opacity="0.7" stroke-dasharray="6,4" />
-      <path d="M 135,-85 A 70 70 0 0 0 55,-25" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.4" />
+      <!-- Right Inner Radar Disc Concavity -->
+      <polygon points="0,-125 120,-205 180,-60 95,-40" fill="url(#facet-light)" />
+      <polygon points="180,-60 180,-15 95,-15" fill="url(#facet-bright)" />
+      <polygon points="180,-15 165,80 75,70" fill="url(#facet-mid)" />
+      <polygon points="95,-40 180,-60 95,-15" fill="url(#facet-dark)" />
 
       <!-- ================= PREDATOR ALMOND RADAR EYES ================= -->
-      <!-- Left Eye Socket -->
-      <polygon points="-135,-65 -65,-75 -50,-40 -120,-30" fill="#060911" stroke="#1e293b" stroke-width="2" />
-      <!-- Left Iris & Pupil -->
-      <polygon points="-120,-60 -75,-68 -62,-44 -108,-38" fill="url(#cyan-glow)" filter="url(#radar-glow)" />
-      <!-- Left Pupil Slit / Sensor Core -->
-      <polygon points="-98,-64 -88,-65 -84,-42 -94,-41" fill="#ffffff" />
-      <!-- Left Warning Target Reticle Accent -->
-      <circle cx="-91" cy="-53" r="3" fill="#fbbf24" />
+      <!-- Left Eye Dark Socket (sharp 25-degree upward predatory cant) -->
+      <polygon points="-150,-70 -65,-80 -50,-30 -130,-18" fill="#04060a" stroke="#1e293b" stroke-width="2" />
+      <!-- Left Glowing Electric Cyan Iris -->
+      <polygon points="-135,-62 -75,-72 -60,-36 -118,-27" fill="url(#cyan-optic)" filter="url(#optic-glow)" />
+      <!-- Left Focused Core Slit / Photodiode -->
+      <polygon points="-102,-63 -88,-65 -84,-34 -98,-32" fill="#ffffff" />
+      <!-- Left Sentinel Amber Reticle Node -->
+      <circle cx="-92" cy="-48" r="4" fill="url(#amber-core)" />
 
-      <!-- Right Eye Socket -->
-      <polygon points="135,-65 65,-75 50,-40 120,-30" fill="#060911" stroke="#1e293b" stroke-width="2" />
-      <!-- Right Iris & Pupil -->
-      <polygon points="120,-60 75,-68 62,-44 108,-38" fill="url(#cyan-glow)" filter="url(#radar-glow)" />
-      <!-- Right Pupil Slit / Sensor Core -->
-      <polygon points="98,-64 88,-65 84,-42 94,-41" fill="#ffffff" />
-      <!-- Right Warning Target Reticle Accent -->
-      <circle cx="91" cy="-53" r="3" fill="#fbbf24" />
+      <!-- Right Eye Dark Socket (sharp 25-degree upward predatory cant) -->
+      <polygon points="150,-70 65,-80 50,-30 130,-18" fill="#04060a" stroke="#1e293b" stroke-width="2" />
+      <!-- Right Glowing Electric Cyan Iris -->
+      <polygon points="135,-62 75,-72 60,-36 118,-27" fill="url(#cyan-optic)" filter="url(#optic-glow)" />
+      <!-- Right Focused Core Slit / Photodiode -->
+      <polygon points="102,-63 88,-65 84,-34 98,-32" fill="#ffffff" />
+      <!-- Right Sentinel Amber Reticle Node -->
+      <circle cx="92" cy="-48" r="4" fill="url(#amber-core)" />
 
-      <!-- Eye Brow Ridge -->
-      <polygon points="0,-130 -65,-75 -50,-40 0,-70" fill="#334155" />
-      <polygon points="0,-130 65,-75 50,-40 0,-70" fill="#475569" />
+      <!-- Central Brow Bridge (Between eyes) -->
+      <polygon points="0,-125 -65,-80 -50,-30 0,-65" fill="url(#facet-dark)" />
+      <polygon points="0,-125 65,-80 50,-30 0,-65" fill="url(#facet-light)" />
 
-      <!-- ================= BEAK (AERODYNAMIC SLATE WEDGE) ================= -->
-      <polygon points="0,-70 -30,-20 0,35" fill="#1e293b" />
-      <polygon points="0,-70 30,-20 0,35" fill="#334155" />
-      <polygon points="0,35 -16,65 0,85" fill="#0f172a" />
-      <polygon points="0,35 16,65 0,85" fill="#1e293b" />
-      <line x1="0" y1="-70" x2="0" y2="85" stroke="#00f5ff" stroke-width="2" opacity="0.9" />
+      <!-- ================= PREDATOR HOOKED BEAK ================= -->
+      <polygon points="0,-65 -30,-15 0,55" fill="url(#facet-dark)" />
+      <polygon points="0,-65 30,-15 0,55" fill="url(#facet-bright)" />
+      <polygon points="0,55 -16,88 0,110" fill="url(#facet-deep)" />
+      <polygon points="0,55 16,88 0,110" fill="url(#facet-light)" />
+      <line x1="0" y1="-65" x2="0" y2="110" stroke="#00f5ff" stroke-width="2.5" opacity="0.8" />
 
-      <!-- ================= WINGS & ARMOR CHEST ================= -->
+      <!-- ================= CHEST & WING ARMOR PLATES ================= -->
       <!-- Left Wing Facets -->
-      <polygon points="-235,80 -180,210 -110,170 -150,70" fill="#1e293b" />
-      <polygon points="-180,210 -110,310 -60,240 -110,170" fill="#0f172a" />
-      
+      <polygon points="-260,105 -190,235 -115,185 -165,80" fill="url(#facet-dark)" />
+      <polygon points="-190,235 -110,340 -60,255 -115,185" fill="url(#facet-deep)" />
+
       <!-- Right Wing Facets -->
-      <polygon points="235,80 180,210 110,170 150,70" fill="#334155" />
-      <polygon points="180,210 110,310 60,240 110,170" fill="#1e293b" />
+      <polygon points="260,105 190,235 115,185 165,80" fill="url(#facet-light)" />
+      <polygon points="190,235 110,340 60,255 115,185" fill="url(#facet-dark)" />
 
-      <!-- Central Breastplate / Radar Frequency Dish -->
-      <polygon points="0,85 -70,60 -110,170 0,160" fill="#1e293b" />
-      <polygon points="0,85 70,60 110,170 0,160" fill="#334155" />
+      <!-- Center Breastplate Keel -->
+      <polygon points="0,110 -75,70 -115,185 0,175" fill="url(#facet-dark)" />
+      <polygon points="0,110 75,70 115,185 0,175" fill="url(#facet-bright)" />
 
-      <polygon points="0,160 -110,170 -60,240 0,230" fill="#0f172a" />
-      <polygon points="0,160 110,170 60,240 0,230" fill="#1e293b" />
+      <polygon points="0,175 -115,185 -60,255 0,248" fill="url(#facet-deep)" />
+      <polygon points="0,175 115,185 60,255 0,248" fill="url(#facet-light)" />
 
-      <polygon points="0,230 -60,240 -110,310 0,350" fill="#1e293b" />
-      <polygon points="0,230 60,240 110,310 0,350" fill="#334155" />
+      <polygon points="0,248 -60,255 -110,340 0,380" fill="url(#facet-dark)" />
+      <polygon points="0,248 60,255 110,340 0,380" fill="url(#facet-bright)" />
 
-      <!-- Chest Telemetry Chevron Accents -->
-      <path d="M -50,130 L 0,160 L 50,130" fill="none" stroke="#00f5ff" stroke-width="3" opacity="0.85" stroke-linejoin="round" />
-      <path d="M -40,195 L 0,225 L 40,195" fill="none" stroke="#00f5ff" stroke-width="2.5" opacity="0.65" stroke-linejoin="round" />
-      <path d="M -30,260 L 0,285 L 30,260" fill="none" stroke="#00f5ff" stroke-width="2" opacity="0.45" stroke-linejoin="round" />
-
-      <!-- Center Telemetry Pulse Node -->
-      <circle cx="0" cy="160" r="5" fill="#00f5ff" filter="url(#radar-glow)" />
-      <circle cx="0" cy="225" r="4" fill="#00f5ff" />
-      <circle cx="0" cy="285" r="3" fill="#fbbf24" />
+      <!-- Telemetry Keel Chevrons -->
+      <polygon points="0,175 -48,142 -38,137 0,165 38,137 48,142" fill="#00f5ff" opacity="0.85" />
+      <polygon points="0,248 -38,218 -28,213 0,238 28,213 38,218" fill="#00f5ff" opacity="0.65" />
+      <polygon points="0,320 -28,290 -20,285 0,310 20,285 28,290" fill="#fbbf24" opacity="0.75" />
 
     </g>
   </g>
