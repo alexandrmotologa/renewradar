@@ -1,0 +1,27 @@
+{
+  "name": "renewradar",
+  "version": "1.0.0",
+  "description": "Telegram Mini App and autonomous watchdog bot tracking subscription burn rate and trial expiries with zero banking credentials",
+  "scripts": {
+    "dev": "cd server && npm run dev",
+    "build:server": "cd server && npm run build",
+    "build:web": "cd web && npm run build",
+    "build": "npm run build:server && npm run build:web",
+    "test": "cd server && npm test",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "telegram-mini-app",
+    "telegram-bot",
+    "subscription-tracker",
+    "fintech",
+    "sqlite",
+    "fastify",
+    "typescript",
+    "react",
+    "self-hosted",
+    "privacy-first"
+  ],
+  "author": "Alexandr Motologa",
+  "license": "MIT"
+}
