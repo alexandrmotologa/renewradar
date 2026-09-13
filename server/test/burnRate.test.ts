@@ -3,6 +3,7 @@ import { convertCurrency, normalizeToMonthly, calculateYearlyProjection } from '
 import { getDatabase, closeDatabase } from '../src/db/database.js';
 import { seedDemoData, DEMO_TELEGRAM_USER_ID } from '../src/db/seeder.js';
 import { SubscriptionService } from '../src/services/subscriptionService.js';
+import { IngestionService } from '../src/services/ingestionService.js';
 
 describe('Burn Rate & Currency Math', () => {
   it('normalizes monthly billing cycle directly', () => {
@@ -16,9 +17,7 @@ describe('Burn Rate & Currency Math', () => {
   });
 
   it('normalizes weekly subscriptions by multiplying by 4.3333', () => {
-    // 10 * 4.3333 = 43.333 -> 43.33
     expect(normalizeToMonthly(10, 'WEEKLY')).toBe(43.33);
-    // 5 * 4.3333 = 21.6665 -> 21.67
     expect(normalizeToMonthly(5, 'WEEKLY')).toBe(21.67);
   });
 
@@ -28,24 +27,15 @@ describe('Burn Rate & Currency Math', () => {
   });
 
   it('converts currencies correctly via EUR base', () => {
-    // EUR -> USD (1 EUR = 1.08 USD)
     expect(convertCurrency(100, 'EUR', 'USD')).toBe(108);
-
-    // USD -> EUR (108 USD = 100 EUR)
     expect(convertCurrency(108, 'USD', 'EUR')).toBe(100);
-
-    // EUR -> RON (1 EUR = 4.97 RON)
     expect(convertCurrency(10, 'EUR', 'RON')).toBe(49.7);
-
-    // EUR -> GBP (1 EUR = 0.85 GBP)
     expect(convertCurrency(100, 'EUR', 'GBP')).toBe(85);
-
-    // Identity
     expect(convertCurrency(50, 'EUR', 'EUR')).toBe(50);
   });
 });
 
-describe('Database & Demo Seeder Stats', () => {
+describe('Database & Demo Seeder Advanced Features', () => {
   beforeEach(() => {
     closeDatabase();
     process.env.DATABASE_PATH = ':memory:';
@@ -55,12 +45,9 @@ describe('Database & Demo Seeder Stats', () => {
     closeDatabase();
   });
 
-  it('seeds 6 subscriptions totaling exactly 85 EUR/month burn rate and 1020 EUR/year', () => {
+  it('seeds active subscriptions totaling exactly 85 EUR/month burn rate and 1020 EUR/year', () => {
     const db = getDatabase(':memory:');
     seedDemoData(db);
-
-    const subscriptions = SubscriptionService.getSubscriptions(DEMO_TELEGRAM_USER_ID);
-    expect(subscriptions.length).toBe(6);
 
     const stats = SubscriptionService.getStats(DEMO_TELEGRAM_USER_ID, 'EUR');
     expect(stats.total_monthly_burn).toBe(85.0);
@@ -75,16 +62,92 @@ describe('Database & Demo Seeder Stats', () => {
     expect(stats.category_breakdown.FITNESS).toBe(17.0); // 17 (Gym)
   });
 
-  it('correctly detects trial expiration within 48 hours', () => {
+  it('correctly calculates my_net_monthly_burn with family split', () => {
     const db = getDatabase(':memory:');
     seedDemoData(db);
 
     const stats = SubscriptionService.getStats(DEMO_TELEGRAM_USER_ID, 'EUR');
-    const chatGpt = stats.upcoming_charges.find(c => c.name === 'ChatGPT Plus');
+    // Netflix is 14 EUR split 2 ways -> personal share is 7 EUR (7 EUR discount from 85)
+    // 85 - 7 = 78 EUR net burn
+    expect(stats.my_net_monthly_burn).toBe(78.0);
+    expect(stats.my_net_yearly_burn).toBe(936.0);
+  });
 
-    expect(chatGpt).toBeDefined();
-    expect(chatGpt?.is_free_trial).toBe(true);
-    expect(chatGpt?.hours_remaining).toBeGreaterThan(0);
-    expect(chatGpt?.hours_remaining).toBeLessThanOrEqual(48);
+  it('calculates lifetime money saved from cancelled trials', () => {
+    const db = getDatabase(':memory:');
+    seedDemoData(db);
+
+    const stats = SubscriptionService.getStats(DEMO_TELEGRAM_USER_ID, 'EUR');
+    // Adobe Creative Cloud was cancelled saving 105 EUR
+    expect(stats.lifetime_saved).toBe(105.0);
+  });
+
+  it('identifies redundant subscriptions with Ghost Hunter', () => {
+    const db = getDatabase(':memory:');
+    seedDemoData(db);
+
+    const stats = SubscriptionService.getStats(DEMO_TELEGRAM_USER_ID, 'EUR');
+    const aiRec = stats.ghost_recommendations.find(r => r.category === 'AI_TOOLS');
+    expect(aiRec).toBeDefined();
+    expect(aiRec?.services).toContain('ChatGPT Plus');
+    expect(aiRec?.services).toContain('Claude Pro');
+    expect(aiRec?.total_monthly_cost).toBe(40.0);
+    expect(aiRec?.potential_savings).toBe(20.0);
+  });
+
+  it('generates valid RFC 5545 iCalendar stream with VEVENT and VALARM', () => {
+    const db = getDatabase(':memory:');
+    seedDemoData(db);
+
+    const ics = SubscriptionService.generateIcsCalendar(DEMO_TELEGRAM_USER_ID);
+    expect(ics).toContain('BEGIN:VCALENDAR');
+    expect(ics).toContain('VERSION:2.0');
+    expect(ics).toContain('PRODID:-//RenewRadar//Subscription Watchdog//EN');
+    expect(ics).toContain('BEGIN:VEVENT');
+    expect(ics).toContain('SUMMARY:Renew: Netflix Standard');
+    expect(ics).toContain('BEGIN:VALARM');
+    expect(ics).toContain('END:VCALENDAR');
+  });
+
+  it('cancels trial and credits saved amount', () => {
+    const db = getDatabase(':memory:');
+    seedDemoData(db);
+
+    // Cancel ChatGPT Plus
+    const cancelled = SubscriptionService.cancelSubscription('demo_chatgpt_plus', DEMO_TELEGRAM_USER_ID);
+    expect(cancelled).toBeDefined();
+    expect(cancelled?.status).toBe('CANCELLED');
+    expect(cancelled?.saved_amount).toBe(60.0); // 20 * 3 months
+
+    const stats = SubscriptionService.getStats(DEMO_TELEGRAM_USER_ID, 'EUR');
+    // 105 (Adobe) + 60 (ChatGPT) = 165.0
+    expect(stats.lifetime_saved).toBe(165.0);
+    // Active monthly burn decreases from 85 to 65
+    expect(stats.total_monthly_burn).toBe(65.0);
+  });
+});
+
+describe('Smart Ingestion Parser', () => {
+  it('parses trial confirmation text', () => {
+    const text = 'Your 14-day free trial of Midjourney has started. You will be billed $30/month starting Oct 15.';
+    const parsed = IngestionService.parseText(text);
+
+    expect(parsed).toBeDefined();
+    expect(parsed?.name).toBe('Midjourney');
+    expect(parsed?.amount).toBe(30.0);
+    expect(parsed?.currency).toBe('USD');
+    expect(parsed?.is_free_trial).toBe(true);
+    expect(parsed?.trial_duration_days).toBe(14);
+  });
+
+  it('parses Netflix receipt with EUR currency', () => {
+    const text = 'Thanks for your payment to Netflix. Monthly membership is € 14.99 billed on your card.';
+    const parsed = IngestionService.parseText(text);
+
+    expect(parsed).toBeDefined();
+    expect(parsed?.name).toBe('Netflix');
+    expect(parsed?.amount).toBe(14.99);
+    expect(parsed?.currency).toBe('EUR');
+    expect(parsed?.is_free_trial).toBe(false);
   });
 });

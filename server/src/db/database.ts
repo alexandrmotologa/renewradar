@@ -36,6 +36,7 @@ export function getDatabase(dbPath?: string): any {
   dbInstance.exec('PRAGMA foreign_keys = ON;');
 
   initSchema(dbInstance);
+  runMigrations(dbInstance);
   return dbInstance;
 }
 
@@ -54,7 +55,12 @@ function initSchema(db: any): void {
       trial_duration_days INTEGER DEFAULT 0,
       alert_sent INTEGER DEFAULT 0,
       cancel_url TEXT,
+      cancellation_steps TEXT,
       notes TEXT,
+      status TEXT DEFAULT 'ACTIVE',
+      saved_amount REAL DEFAULT 0.0,
+      shared_with_count INTEGER DEFAULT 1,
+      platform TEXT DEFAULT 'WEB',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -69,10 +75,31 @@ function initSchema(db: any): void {
       telegram_user_id INTEGER PRIMARY KEY,
       preferred_currency TEXT DEFAULT 'EUR',
       alert_threshold_hours INTEGER DEFAULT 48,
+      alert_thresholds TEXT DEFAULT '[48, 24]',
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
   `);
+}
+
+function runMigrations(db: any): void {
+  // Non-destructive column additions for existing tables
+  const columns = [
+    { table: 'subscriptions', column: 'cancellation_steps', type: 'TEXT' },
+    { table: 'subscriptions', column: 'status', type: "TEXT DEFAULT 'ACTIVE'" },
+    { table: 'subscriptions', column: 'saved_amount', type: 'REAL DEFAULT 0.0' },
+    { table: 'subscriptions', column: 'shared_with_count', type: 'INTEGER DEFAULT 1' },
+    { table: 'subscriptions', column: 'platform', type: "TEXT DEFAULT 'WEB'" },
+    { table: 'user_settings', column: 'alert_thresholds', type: "TEXT DEFAULT '[48, 24]'" },
+  ];
+
+  for (const item of columns) {
+    try {
+      db.exec(`ALTER TABLE ${item.table} ADD COLUMN ${item.column} ${item.type};`);
+    } catch (e) {
+      // Column already exists, ignore error safely
+    }
+  }
 }
 
 export function closeDatabase(): void {

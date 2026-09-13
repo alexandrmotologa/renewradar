@@ -26,6 +26,16 @@ export async function portabilityRoutes(fastify: FastifyInstance): Promise<void>
     }
   );
 
+  // GET /api/calendar.ics - Standard iCalendar RFC 5545 feed
+  fastify.get('/api/calendar.ics', async (request: FastifyRequest, reply: FastifyReply) => {
+    const userId = request.user!.id;
+    const icsContent = SubscriptionService.generateIcsCalendar(userId);
+
+    reply.header('Content-Type', 'text/calendar; charset=utf-8');
+    reply.header('Content-Disposition', 'attachment; filename="renewradar.ics"');
+    return reply.send(icsContent);
+  });
+
   // POST /api/import
   fastify.post<{ Body: { subscriptions: CreateSubscriptionInput[] } }>(
     '/api/import',

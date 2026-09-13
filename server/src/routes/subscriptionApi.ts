@@ -58,6 +58,36 @@ export async function subscriptionRoutes(fastify: FastifyInstance): Promise<void
     }
   );
 
+  // POST /api/subscriptions/:id/cancel
+  fastify.post<{ Params: { id: string }; Body: { saved_amount?: number } }>(
+    '/api/subscriptions/:id/cancel',
+    async (request, reply) => {
+      const userId = request.user!.id;
+      const cancelled = SubscriptionService.cancelSubscription(
+        request.params.id,
+        userId,
+        request.body?.saved_amount
+      );
+      if (!cancelled) {
+        return reply.status(404).send({ error: 'Subscription not found' });
+      }
+      return reply.send(cancelled);
+    }
+  );
+
+  // POST /api/subscriptions/:id/reactivate
+  fastify.post<{ Params: { id: string } }>(
+    '/api/subscriptions/:id/reactivate',
+    async (request, reply) => {
+      const userId = request.user!.id;
+      const reactivated = SubscriptionService.reactivateSubscription(request.params.id, userId);
+      if (!reactivated) {
+        return reply.status(404).send({ error: 'Subscription not found' });
+      }
+      return reply.send(reactivated);
+    }
+  );
+
   // DELETE /api/subscriptions/:id
   fastify.delete<{ Params: { id: string } }>(
     '/api/subscriptions/:id',

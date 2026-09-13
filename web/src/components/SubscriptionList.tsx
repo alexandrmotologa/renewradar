@@ -9,24 +9,29 @@ import {
   Trash2, 
   CheckCircle2, 
   Clock, 
-  AlertCircle 
+  AlertCircle,
+  Search,
+  Users
 } from 'lucide-react';
 import { Category, Subscription } from '../types/index.js';
 import { useTelegram } from '../hooks/useTelegram.js';
 
 interface SubscriptionListProps {
   subscriptions: Subscription[];
+  onSelectSubscription: (subscription: Subscription) => void;
   onDelete: (id: string) => Promise<boolean>;
   onUpdate: (id: string, updates: any) => Promise<boolean>;
 }
 
 export const SubscriptionList: React.FC<SubscriptionListProps> = ({
   subscriptions,
+  onSelectSubscription,
   onDelete,
   onUpdate,
 }) => {
   const { haptic } = useTelegram();
-  const [activeTab, setActiveTab] = useState<'ALL' | 'TRIALS' | Category>('ALL');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'TRIALS' | 'ARCHIVED' | Category>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const getCategoryIcon = (category: Category) => {
     switch (category) {
@@ -39,6 +44,21 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
   };
 
   const filteredSubscriptions = subscriptions.filter((sub) => {
+    // Search query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchesName = sub.name.toLowerCase().includes(q);
+      const matchesNotes = (sub.notes || '').toLowerCase().includes(q);
+      if (!matchesName && !matchesNotes) return false;
+    }
+
+    if (activeTab === 'ARCHIVED') {
+      return sub.status === 'CANCELLED' || sub.status === 'PAUSED';
+    }
+
+    // Otherwise exclude archived from regular tabs
+    if (sub.status === 'CANCELLED') return false;
+
     if (activeTab === 'ALL') return true;
     if (activeTab === 'TRIALS') return sub.is_free_trial === 1;
     return sub.category === activeTab;
@@ -50,15 +70,37 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
 
   return (
     <div className="space-y-3">
+      
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Search subscriptions or notes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-3 py-2 rounded-2xl bg-obsidian-900 border border-obsidian-700/80 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-glow transition-colors"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       {/* Category & Filter Tabs */}
       <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'ALL', label: 'All', count: subscriptions.length },
-          { id: 'TRIALS', label: 'Free Trials', count: subscriptions.filter(s => s.is_free_trial === 1).length },
-          { id: 'AI_TOOLS', label: 'AI', count: subscriptions.filter(s => s.category === 'AI_TOOLS').length },
-          { id: 'STREAMING', label: 'Streaming', count: subscriptions.filter(s => s.category === 'STREAMING').length },
-          { id: 'WORK', label: 'Work', count: subscriptions.filter(s => s.category === 'WORK').length },
-          { id: 'FITNESS', label: 'Fitness', count: subscriptions.filter(s => s.category === 'FITNESS').length },
+          { id: 'ALL', label: 'All', count: subscriptions.filter(s => s.status === 'ACTIVE').length },
+          { id: 'TRIALS', label: 'Free Trials', count: subscriptions.filter(s => s.is_free_trial === 1 && s.status === 'ACTIVE').length },
+          { id: 'AI_TOOLS', label: 'AI', count: subscriptions.filter(s => s.category === 'AI_TOOLS' && s.status === 'ACTIVE').length },
+          { id: 'STREAMING', label: 'Streaming', count: subscriptions.filter(s => s.category === 'STREAMING' && s.status === 'ACTIVE').length },
+          { id: 'WORK', label: 'Work', count: subscriptions.filter(s => s.category === 'WORK' && s.status === 'ACTIVE').length },
+          { id: 'FITNESS', label: 'Fitness', count: subscriptions.filter(s => s.category === 'FITNESS' && s.status === 'ACTIVE').length },
+          { id: 'ARCHIVED', label: 'Archived', count: subscriptions.filter(s => s.status === 'CANCELLED').length },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -90,7 +132,7 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
           <Clock className="w-8 h-8 text-slate-500 mx-auto mb-2" />
           <h4 className="text-sm font-semibold text-slate-300">No subscriptions found</h4>
           <p className="text-xs text-slate-400 mt-1">
-            Tap the + Add button above to register your recurring services.
+            {searchQuery ? 'Try a different search term' : 'Tap the + Add button above to register your recurring services.'}
           </p>
         </div>
       ) : (
@@ -101,12 +143,21 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
             const daysRemaining = Math.max(0, Math.ceil(diffMs / dayMs));
             const isTrial = sub.is_free_trial === 1;
             const isUrgent = isTrial && hoursRemaining <= 48 && hoursRemaining > 0;
+            const isCancelled = sub.status === 'CANCELLED';
 
             return (
               <div
                 key={sub.id}
-                className={`relative overflow-hidden rounded-2xl p-3.5 glass-card transition-all ${
-                  isUrgent ? 'border-amber-500/60 alert-ring' : 'border-obsidian-700/60'
+                onClick={() => {
+                  haptic('light');
+                  onSelectSubscription(sub);
+                }}
+                className={`relative overflow-hidden rounded-2xl p-3.5 glass-card cursor-pointer transition-all hover:border-cyan-glow/40 ${
+                  isUrgent 
+                    ? 'border-amber-500/60 alert-ring' 
+                    : isCancelled
+                    ? 'border-obsidian-800 opacity-75'
+                    : 'border-obsidian-700/60'
                 }`}
               >
                 <div className="flex items-start justify-between">
@@ -117,7 +168,7 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center space-x-2">
-                        <h3 className="text-sm font-bold text-white truncate">
+                        <h3 className={`text-sm font-bold truncate ${isCancelled ? 'line-through text-slate-400' : 'text-white'}`}>
                           {sub.name}
                         </h3>
                         {isTrial && (
@@ -129,11 +180,21 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
                             Free Trial
                           </span>
                         )}
+                        {sub.shared_with_count > 1 && (
+                          <span className="flex items-center space-x-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                            <Users className="w-2.5 h-2.5 mr-0.5" />
+                            <span>1/{sub.shared_with_count}</span>
+                          </span>
+                        )}
                       </div>
 
                       {/* Renewal Countdown Badge */}
                       <div className="flex items-center space-x-1.5 mt-1 text-[11px]">
-                        {isUrgent ? (
+                        {isCancelled ? (
+                          <span className="text-rose-400 font-medium">
+                            Cancelled (Saved {sub.saved_amount} {sub.currency})
+                          </span>
+                        ) : isUrgent ? (
                           <span className="flex items-center text-amber-400 font-bold">
                             <AlertCircle className="w-3 h-3 mr-1" />
                             Expires in {hoursRemaining}h!
@@ -150,7 +211,7 @@ export const SubscriptionList: React.FC<SubscriptionListProps> = ({
                   </div>
 
                   {/* Price and Actions */}
-                  <div className="text-right shrink-0">
+                  <div className="text-right shrink-0" onClick={(e) => e.stopPropagation()}>
                     <div className="text-sm font-extrabold text-white">
                       {sub.amount.toFixed(2)} {sub.currency}
                     </div>

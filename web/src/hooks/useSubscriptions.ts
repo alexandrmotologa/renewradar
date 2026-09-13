@@ -108,6 +108,51 @@ export function useSubscriptions() {
     }
   };
 
+  const cancelSubscription = async (id: string, savedAmount?: number): Promise<boolean> => {
+    try {
+      haptic('warning');
+      const res = await fetch(`/api/subscriptions/${id}/cancel`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ saved_amount: savedAmount }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to cancel subscription');
+      }
+
+      await fetchAll(currency);
+      haptic('success');
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      haptic('error');
+      return false;
+    }
+  };
+
+  const reactivateSubscription = async (id: string): Promise<boolean> => {
+    try {
+      haptic('medium');
+      const res = await fetch(`/api/subscriptions/${id}/reactivate`, {
+        method: 'POST',
+        headers: getHeaders(),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to reactivate subscription');
+      }
+
+      await fetchAll(currency);
+      haptic('success');
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      haptic('error');
+      return false;
+    }
+  };
+
   const deleteSubscription = async (id: string): Promise<boolean> => {
     try {
       haptic('heavy');
@@ -189,6 +234,8 @@ export function useSubscriptions() {
     refresh: fetchAll,
     addSubscription,
     updateSubscription,
+    cancelSubscription,
+    reactivateSubscription,
     deleteSubscription,
     changeCurrency,
     exportData,

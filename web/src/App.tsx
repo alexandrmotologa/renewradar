@@ -4,11 +4,15 @@ import { useSubscriptions } from './hooks/useSubscriptions.js';
 import { useTelegram } from './hooks/useTelegram.js';
 import { Header } from './components/Header.js';
 import { BurnRateHero } from './components/BurnRateHero.js';
+import { LifetimeSavedBanner } from './components/LifetimeSavedBanner.js';
+import { GhostHunterCard } from './components/GhostHunterCard.js';
 import { CategoryDonut } from './components/CategoryDonut.js';
 import { SubscriptionList } from './components/SubscriptionList.js';
 import { RenewalCalendar } from './components/RenewalCalendar.js';
 import { AddSubscriptionModal } from './components/AddSubscriptionModal.js';
+import { SubscriptionDetailModal } from './components/SubscriptionDetailModal.js';
 import { SettingsModal } from './components/SettingsModal.js';
+import { Subscription } from './types/index.js';
 
 export function App() {
   const { haptic } = useTelegram();
@@ -22,6 +26,8 @@ export function App() {
     refresh,
     addSubscription,
     updateSubscription,
+    cancelSubscription,
+    reactivateSubscription,
     deleteSubscription,
     changeCurrency,
     exportData,
@@ -31,6 +37,7 @@ export function App() {
   const [activeView, setActiveView] = useState<'DASHBOARD' | 'SUBSCRIPTIONS' | 'CALENDAR'>('DASHBOARD');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
 
   return (
     <div className="min-h-screen bg-obsidian-950 text-slate-100 flex flex-col pb-20">
@@ -67,9 +74,33 @@ export function App() {
               onCurrencyChange={changeCurrency}
             />
 
+            {/* Lifetime Money Saved Banner */}
+            {stats && stats.lifetime_saved > 0 && (
+              <LifetimeSavedBanner
+                amount={stats.lifetime_saved}
+                currency={currency}
+                onViewArchived={() => {
+                  haptic('selection');
+                  setActiveView('SUBSCRIPTIONS');
+                }}
+              />
+            )}
+
+            {/* Ghost Hunter Redundancy Detector */}
+            {stats && stats.ghost_recommendations && stats.ghost_recommendations.length > 0 && (
+              <GhostHunterCard
+                recommendations={stats.ghost_recommendations}
+                currency={currency}
+                onInspectCategory={() => {
+                  haptic('selection');
+                  setActiveView('SUBSCRIPTIONS');
+                }}
+              />
+            )}
+
             <CategoryDonut stats={stats} currency={currency} />
 
-            {/* Quick Preview of Subscriptions */}
+            {/* Active Subscriptions Quick List */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -82,12 +113,13 @@ export function App() {
                   }}
                   className="text-xs font-semibold text-cyan-glow hover:underline"
                 >
-                  View all ({subscriptions.length})
+                  View all ({subscriptions.filter(s => s.status === 'ACTIVE').length})
                 </button>
               </div>
 
               <SubscriptionList
-                subscriptions={subscriptions.slice(0, 4)}
+                subscriptions={subscriptions}
+                onSelectSubscription={(sub) => setSelectedSubscription(sub)}
                 onDelete={deleteSubscription}
                 onUpdate={updateSubscription}
               />
@@ -116,6 +148,7 @@ export function App() {
 
             <SubscriptionList
               subscriptions={subscriptions}
+              onSelectSubscription={(sub) => setSelectedSubscription(sub)}
               onDelete={deleteSubscription}
               onUpdate={updateSubscription}
             />
@@ -130,7 +163,7 @@ export function App() {
               <p className="text-xs text-slate-400">Upcoming invoice dates across all services</p>
             </div>
 
-            <RenewalCalendar subscriptions={subscriptions} />
+            <RenewalCalendar subscriptions={subscriptions.filter(s => s.status === 'ACTIVE')} />
           </div>
         )}
 
@@ -195,6 +228,16 @@ export function App() {
         onAdd={addSubscription}
         presets={presets}
         defaultCurrency={currency}
+      />
+
+      <SubscriptionDetailModal
+        subscription={selectedSubscription}
+        isOpen={Boolean(selectedSubscription)}
+        onClose={() => setSelectedSubscription(null)}
+        onUpdate={updateSubscription}
+        onCancelSub={cancelSubscription}
+        onReactivateSub={reactivateSubscription}
+        onDelete={deleteSubscription}
       />
 
       <SettingsModal

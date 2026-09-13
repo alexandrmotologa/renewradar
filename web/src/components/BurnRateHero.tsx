@@ -1,5 +1,5 @@
-import React from 'react';
-import { Flame, AlertTriangle, Radio } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flame, AlertTriangle, Radio, Users } from 'lucide-react';
 import { Currency, StatsResponse } from '../types/index.js';
 
 interface BurnRateHeroProps {
@@ -14,6 +14,7 @@ export const BurnRateHero: React.FC<BurnRateHeroProps> = ({
   onCurrencyChange,
 }) => {
   const currencies: Currency[] = ['EUR', 'USD', 'RON', 'GBP'];
+  const [viewMode, setViewMode] = useState<'TOTAL' | 'NET'>('TOTAL');
 
   const getCurrencySymbol = (curr: Currency) => {
     switch (curr) {
@@ -24,8 +25,15 @@ export const BurnRateHero: React.FC<BurnRateHeroProps> = ({
     }
   };
 
-  const monthlyBurn = stats?.total_monthly_burn ?? 0;
-  const yearlyBurn = stats?.total_yearly_burn ?? 0;
+  const hasShared = (stats?.my_net_monthly_burn ?? 0) < (stats?.total_monthly_burn ?? 0);
+  const monthlyBurn = viewMode === 'NET' && hasShared
+    ? (stats?.my_net_monthly_burn ?? 0)
+    : (stats?.total_monthly_burn ?? 0);
+
+  const yearlyBurn = viewMode === 'NET' && hasShared
+    ? (stats?.my_net_yearly_burn ?? 0)
+    : (stats?.total_yearly_burn ?? 0);
+
   const count = stats?.subscription_count ?? 0;
   const expiringTrials = stats?.expiring_trials_count ?? 0;
 
@@ -74,6 +82,35 @@ export const BurnRateHero: React.FC<BurnRateHeroProps> = ({
           </span>
           <span className="text-xs text-slate-400 font-medium">/ month</span>
         </div>
+
+        {/* Family Split Toggle if Shared Subscriptions Exist */}
+        {hasShared && (
+          <div className="flex items-center space-x-2 my-2">
+            <div className="flex items-center bg-obsidian-950/80 p-1 rounded-xl border border-obsidian-700 text-xs">
+              <button
+                onClick={() => setViewMode('TOTAL')}
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all ${
+                  viewMode === 'TOTAL'
+                    ? 'bg-obsidian-800 text-white'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Total Billed
+              </button>
+              <button
+                onClick={() => setViewMode('NET')}
+                className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all flex items-center space-x-1 ${
+                  viewMode === 'NET'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Users className="w-3 h-3 mr-0.5" />
+                <span>My Share ({stats?.my_net_monthly_burn.toFixed(2)} {getCurrencySymbol(currentCurrency)})</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Annual Projection Details */}
         <div className="flex items-center justify-between text-xs text-slate-400 pt-1 pb-3 border-b border-obsidian-700/60">

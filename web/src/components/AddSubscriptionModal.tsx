@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Calendar, Link } from 'lucide-react';
+import { X, Sparkles, Calendar, Link, Users, ShieldAlert } from 'lucide-react';
 import { 
   BillingCycle, 
   Category, 
   CreateSubscriptionInput, 
   Currency, 
+  Platform, 
   PresetTemplate 
 } from '../types/index.js';
 import { useTelegram } from '../hooks/useTelegram.js';
@@ -35,10 +36,13 @@ export const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
   const [currency, setCurrency] = useState<Currency>(defaultCurrency);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('MONTHLY');
   const [category, setCategory] = useState<Category>('STREAMING');
+  const [platform, setPlatform] = useState<Platform>('WEB');
+  const [sharedWithCount, setSharedWithCount] = useState(1);
   const [isFreeTrial, setIsFreeTrial] = useState(false);
   const [trialDays, setTrialDays] = useState(14);
   const [nextBillingDate, setNextBillingDate] = useState(defaultNextDate);
   const [cancelUrl, setCancelUrl] = useState('');
+  const [cancellationSteps, setCancellationSteps] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   if (!isOpen) return null;
@@ -50,7 +54,9 @@ export const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
     setCurrency(preset.defaultCurrency);
     setBillingCycle(preset.defaultCycle);
     setCategory(preset.category);
+    setPlatform(preset.platform || 'WEB');
     setCancelUrl(preset.cancelUrl || '');
+    setCancellationSteps(preset.cancellationSteps || '');
   };
 
   const handleSetTrialDays = (days: number) => {
@@ -74,10 +80,13 @@ export const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
       currency,
       billing_cycle: billingCycle,
       category,
+      platform,
+      shared_with_count: sharedWithCount,
       next_billing_date: billingTimestamp,
       is_free_trial: isFreeTrial,
       trial_duration_days: isFreeTrial ? trialDays : 0,
       cancel_url: cancelUrl || undefined,
+      cancellation_steps: cancellationSteps || undefined,
     });
 
     setSubmitting(false);
@@ -214,6 +223,41 @@ export const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
             </div>
           </div>
 
+          {/* Platform & Family Split */}
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs font-semibold text-slate-300 block mb-1">
+                Platform / Store
+              </label>
+              <select
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value as Platform)}
+                className="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-obsidian-700 text-white text-xs focus:outline-none focus:border-cyan-glow"
+              >
+                <option value="WEB">Web Portal</option>
+                <option value="APPLE">Apple App Store</option>
+                <option value="GOOGLE">Google Play</option>
+                <option value="OTHER">Other Provider</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1 mb-1">
+                <Users className="w-3.5 h-3.5 text-cyan-glow" />
+                <span>Split with People</span>
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="20"
+                value={sharedWithCount}
+                onChange={(e) => setSharedWithCount(parseInt(e.target.value, 10) || 1)}
+                className="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-obsidian-700 text-white text-xs focus:outline-none focus:border-cyan-glow"
+                placeholder="1 (Personal)"
+              />
+            </div>
+          </div>
+
           {/* Free Trial Toggle */}
           <div className="p-3 rounded-2xl bg-obsidian-950/70 border border-obsidian-700/80">
             <div className="flex items-center justify-between">
@@ -288,14 +332,29 @@ export const AddSubscriptionModal: React.FC<AddSubscriptionModalProps> = ({
           <div>
             <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1 mb-1">
               <Link className="w-3.5 h-3.5 text-slate-400" />
-              <span>Cancellation Link (Optional)</span>
+              <span>Cancellation Link</span>
             </label>
             <input
-              type="url"
-              placeholder="https://service.com/account/cancel"
+              type="text"
+              placeholder="https://service.com/account/cancel or itms-apps://..."
               value={cancelUrl}
               onChange={(e) => setCancelUrl(e.target.value)}
               className="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-obsidian-700 text-white text-xs focus:outline-none focus:border-cyan-glow"
+            />
+          </div>
+
+          {/* Anti-Dark-Pattern Cancellation Cheat-Sheet */}
+          <div>
+            <label className="text-xs font-semibold text-slate-300 flex items-center space-x-1 mb-1">
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-warning" />
+              <span>Cancellation Steps / Cheat-Sheet</span>
+            </label>
+            <textarea
+              rows={2}
+              placeholder="e.g. 1. Go to Settings -> Manage Plan. 2. Click Cancel and decline retention offers."
+              value={cancellationSteps}
+              onChange={(e) => setCancellationSteps(e.target.value)}
+              className="w-full px-3 py-2 rounded-xl bg-obsidian-950 border border-obsidian-700 text-white text-xs focus:outline-none focus:border-cyan-glow resize-none"
             />
           </div>
 
